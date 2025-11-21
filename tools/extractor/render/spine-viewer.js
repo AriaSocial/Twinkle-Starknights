@@ -295,7 +295,7 @@ function render() {
         console.log("Render loop running", renderCount);
     }
 
-    gl.clearColor(0.2, 0.2, 0.2, 1);
+    gl.clearColor(0.94, 0.95, 0.96, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     if (skeleton && animationState) {
