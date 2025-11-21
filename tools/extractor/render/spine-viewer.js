@@ -1,4 +1,3 @@
-
 window.onerror = function (message, source, lineno, colno, error) {
     alert("Global Error: " + message + "\nLine: " + lineno);
 };
@@ -8,6 +7,33 @@ let skeleton, animationState, bounds;
 let lastFrameTime = Date.now() / 1000;
 let isPlaying = true;
 let renderCount = 0;
+
+// Helper to get WebGL clear color from CSS property
+function getClearColorFromCss() {
+    const viewport = document.querySelector('.viewport');
+    if (!viewport) {
+        // Fallback to light mode if element is missing
+        return [0.94, 0.95, 0.96, 1.0];
+    }
+
+    // Get the computed background color (which respects the CSS variable --bg-canvas)
+    const computedColor = window.getComputedStyle(viewport).backgroundColor;
+
+    // We expect an RGB(A) string, e.g., "rgb(224, 226, 229)" or "rgba(x, y, z, a)"
+    if (computedColor.startsWith('rgb')) {
+        const matches = computedColor.match(/\d+(\.\d+)?/g);
+        if (matches && matches.length >= 3) {
+            const r = parseInt(matches[0]) / 255.0;
+            const g = parseInt(matches[1]) / 255.0;
+            const b = parseInt(matches[2]) / 255.0;
+            const a = matches.length === 4 ? parseFloat(matches[3]) : 1.0;
+            return [r, g, b, a];
+        }
+    }
+
+    // Fallback if parsing fails or computed style is not RGB/RGBA
+    return [0.94, 0.95, 0.96, 1.0];
+}
 
 async function init() {
     console.log("Init started");
@@ -52,6 +78,7 @@ async function init() {
         }
     });
 
+    // Event listeners
     document.getElementById('file-input').addEventListener('change', handleFileSelect);
     document.getElementById('play-pause').addEventListener('click', togglePlayPause);
     document.getElementById('animation-list').addEventListener('change', changeAnimation);
@@ -283,7 +310,27 @@ function updateCamera() {
 
 function togglePlayPause() {
     isPlaying = !isPlaying;
-    document.getElementById('play-pause').textContent = isPlaying ? "Pause" : "Play";
+    const button = document.getElementById('play-pause');
+
+    // Check if Lucide icons are available (from the new design)
+    if (typeof lucide !== 'undefined') {
+        const icon = button.querySelector('i');
+        const span = button.querySelector('span');
+
+        if (isPlaying) {
+            span.textContent = "一時停止"; // New design text
+            if (icon) icon.setAttribute('data-lucide', 'pause');
+        } else {
+            span.textContent = "再生"; // New design text
+            if (icon) icon.setAttribute('data-lucide', 'play');
+        }
+
+        // Ensure Lucide updates the SVG
+        lucide.createIcons();
+    } else {
+        // Fallback for old design compatibility (text only)
+        button.textContent = isPlaying ? "Pause" : "Play";
+    }
 }
 
 function render() {
@@ -295,7 +342,11 @@ function render() {
         console.log("Render loop running", renderCount);
     }
 
-    gl.clearColor(0.94, 0.95, 0.96, 1.0);
+    // --- Dynamic Clear Color Fix: Read computed CSS background color and apply to WebGL ---
+    const [r, g, b, a] = getClearColorFromCss();
+    gl.clearColor(r, g, b, a);
+    // --- End Dynamic Clear Color Fix ---
+
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     if (skeleton && animationState) {
