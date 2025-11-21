@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spine Web Viewer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Spine Runtimes -->
+    <script src="https://unpkg.com/@esotericsoftware/spine-webgl@4.0.*/dist/iife/spine-webgl.js"></script>
+    <style>
+        #canvas {
+            background-color: #f0f2f5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside id="controls" class="control-panel">
+            <header class="panel-header">
+                <div class="logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12 12L22 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M12 12V22" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M12 12L2 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <h1>Spine Viewer</h1>
+                </div>
+            </header>
+
+            <div class="upload-section">
+                <label for="file-input" class="upload-area">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <span class="upload-text">ファイルを選択</span>
+                    <span class="upload-hint">.skel, .atlas, .png</span>
+                </label>
+                <input type="file" id="file-input" multiple accept=".skel,.atlas,.png,.json">
+            </div>
+
+            <div id="animation-controls" class="animation-controls" style="display:none;">
+                <div class="control-group">
+                    <label for="skin-list">スキン</label>
+                    <select id="skin-list" class="styled-select"></select>
+                </div>
+
+                <div class="control-group">
+                    <label for="animation-list">アニメーション</label>
+                    <select id="animation-list" class="styled-select"></select>
+                </div>
+
+                <button id="play-pause" class="btn-primary">
+                    <svg class="play-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 4H10V20H6V4Z" fill="currentColor" />
+                        <path d="M14 4H18V20H14V4Z" fill="currentColor" />
+                    </svg>
+                    <span>Pause</span>
+                </button>
+
+                <div class="toggle-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="pma-checkbox" checked>
+                        <span class="toggle-switch"></span>
+                        <span class="toggle-text">PMA</span>
+                    </label>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="debug-checkbox">
+                        <span class="toggle-switch"></span>
+                        <span class="toggle-text">Debug</span>
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <main class="viewport">
+            <canvas id="canvas"></canvas>
+        </main>
+    </div>
+    <script src="render/spine-viewer.js"></script>
+</body>
+
+</html>

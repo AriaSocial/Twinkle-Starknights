@@ -12,7 +12,9 @@ let renderCount = 0;
 async function init() {
     console.log("Init started");
     canvas = document.getElementById("canvas");
-    canvas.width = window.innerWidth;
+    // Account for control panel width (340px on desktop)
+    const controlPanelWidth = window.innerWidth > 768 ? 340 : 0;
+    canvas.width = window.innerWidth - controlPanelWidth;
     canvas.height = window.innerHeight;
 
     const config = { alpha: false };
@@ -38,9 +40,16 @@ async function init() {
 
     // Handle window resize
     window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
+        const controlPanelWidth = window.innerWidth > 768 ? 340 : 0;
+        canvas.width = window.innerWidth - controlPanelWidth;
         canvas.height = window.innerHeight;
-        if (renderer) renderer.resize(spine.ResizeMode.Expand);
+        if (renderer) {
+            renderer.resize(spine.ResizeMode.Expand);
+            // Recalculate camera if skeleton is loaded
+            if (skeleton && bounds) {
+                updateCamera();
+            }
+        }
     });
 
     document.getElementById('file-input').addEventListener('change', handleFileSelect);
@@ -198,18 +207,7 @@ async function handleFileSelect(event) {
         });
         console.log("---------------------------");
 
-        renderer.camera.position.x = bounds.offset.x + bounds.size.x / 2;
-        renderer.camera.position.y = bounds.offset.y + bounds.size.y / 2;
-        renderer.camera.zoom = 1; // Adjust based on size?
-
-        // Auto zoom to fit
-        const windowRatio = canvas.width / canvas.height;
-        const boundsRatio = bounds.size.x / bounds.size.y;
-        if (windowRatio > boundsRatio) {
-            renderer.camera.zoom = bounds.size.y / (canvas.height * 0.9);
-        } else {
-            renderer.camera.zoom = bounds.size.x / (canvas.width * 0.9);
-        }
+        updateCamera();
         console.log("Camera set", renderer.camera.position, renderer.camera.zoom);
 
 
@@ -259,6 +257,27 @@ function changeSkin() {
         skeleton.setSkinByName(skinName);
         skeleton.setSlotsToSetupPose();
         animationState.apply(skeleton);
+    }
+}
+
+function updateCamera() {
+    if (!skeleton || !bounds || !renderer) return;
+
+    renderer.camera.position.x = bounds.offset.x + bounds.size.x / 2;
+    renderer.camera.position.y = bounds.offset.y + bounds.size.y / 2;
+
+    // Calculate proper zoom to maintain aspect ratio
+    const padding = 0.9; // 10% padding
+    const canvasAspect = canvas.width / canvas.height;
+    const boundsAspect = bounds.size.x / bounds.size.y;
+
+    // Choose zoom based on which dimension is limiting
+    if (canvasAspect > boundsAspect) {
+        // Canvas is wider than content, fit to height
+        renderer.camera.zoom = (bounds.size.y / canvas.height) / padding;
+    } else {
+        // Canvas is taller than content, fit to width
+        renderer.camera.zoom = (bounds.size.x / canvas.width) / padding;
     }
 }
 
