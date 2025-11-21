@@ -1,36 +1,33 @@
-/* tools/extractor/style.css - 最終修正案 */
+/* tools/extractor/style.css */
 
-/* --- カラーテーマ定義: Light Theme (Default) --- */
+/* --- ベース変数 (Light Theme Default) --- */
 :root {
     --bg-primary: #f9f9fb;
-    /* メイン背景 */
     --bg-secondary: #ffffff;
-    /* サイドバー/カードの背景 */
     --bg-card: #ffffff;
-    /* コントロールカードの背景 */
     --bg-canvas: #e0e2e5;
-    /* ビューポートの背景 (キャンバスの背景色) */
     --text-primary: #1c1c21;
-    /* 主要テキスト */
     --text-secondary: #5e6670;
-    /* 補助テキスト/ラベル */
     --accent-color: #00bcd1;
-    /* アクセントカラー (Cyan) */
     --accent-hover: #00acc1;
-    /* アクセントホバー */
     --border-color: #e0e0e0;
-    /* ボーダー/セパレータ */
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
     --input-bg: #f5f5f7;
-    /* 入力フィールドの背景 */
     --icon-color: var(--text-secondary);
-    /* アイコンの基本色 */
+
+    /* カスタムセレクト用変数 (ライトテーマ) */
+    --select-bg: #f5f5f7;
+    --select-border: #e0e0e0;
+    --select-text: #1c1c21;
+    --select-hover: #eef0f2;
+    --select-active: #e0e2e5;
+    --dropdown-bg: #ffffff;
+    --dropdown-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* --- Dark Theme (システム設定) --- */
-/* prefers-color-scheme が dark の場合、変数を上書き */
+/* --- System Dark Theme Override --- */
 @media (prefers-color-scheme: dark) {
     :root {
         --bg-primary: #1e1e2e;
@@ -44,11 +41,19 @@
         --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.5);
         --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.7);
         --input-bg: #353850;
+
+        /* カスタムセレクト用変数 (ダークテーマ) */
+        --select-bg: #2b2d31;
+        --select-border: #1e1f22;
+        --select-text: #dbdee1;
+        --select-hover: #35373c;
+        --select-active: #404249;
+        --dropdown-bg: #2b2d31;
+        --dropdown-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 }
 
-/* --- Dark Theme (手動トグル用クラス) --- */
-/* bodyに .theme-dark クラスがある場合、全てを上書き */
+/* --- Manual Theme Overrides --- */
 body.theme-dark {
     --bg-primary: #1e1e2e;
     --bg-secondary: #27293d;
@@ -62,9 +67,40 @@ body.theme-dark {
     --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.7);
     --input-bg: #353850;
     --icon-color: var(--text-secondary);
+
+    --select-bg: #2b2d31;
+    --select-border: #1e1f22;
+    --select-text: #dbdee1;
+    --select-hover: #35373c;
+    --select-active: #404249;
+    --dropdown-bg: #2b2d31;
+    --dropdown-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
-/* --- グローバル/レイアウトスタイル --- */
+body.theme-light {
+    --bg-primary: #f9f9fb;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --bg-canvas: #e0e2e5;
+    --text-primary: #1c1c21;
+    --text-secondary: #5e6670;
+    --border-color: #e0e0e0;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+    --input-bg: #f5f5f7;
+    --icon-color: var(--text-secondary);
+
+    --select-bg: #f5f5f7;
+    --select-border: #e0e0e0;
+    --select-text: #1c1c21;
+    --select-hover: #eef0f2;
+    --select-active: #e0e2e5;
+    --dropdown-bg: #ffffff;
+    --dropdown-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* --- グローバルスタイル --- */
 * {
     margin: 0;
     padding: 0;
@@ -88,29 +124,65 @@ html {
     height: 100%;
 }
 
-/* サイドバー/コントロールパネル */
 .sidebar {
     width: 340px;
-    /* 既存のJSロジック(340px)に合わせる */
     height: 100%;
     background: var(--bg-secondary);
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    padding: 20px;
-    gap: 20px;
+    padding: 0;
     z-index: 10;
     box-shadow: var(--shadow-lg);
-    overflow-y: auto;
+    overflow: hidden;
+    transition: background 0.3s, border-color 0.3s;
 }
 
-/* ヘッダー */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 15px;
+    padding: 20px 20px 15px 20px;
     border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.scroll-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    --mask-top-alpha: 1;
+    --mask-bottom-alpha: 0;
+
+    mask-image: linear-gradient(to bottom,
+            rgba(0, 0, 0, var(--mask-top-alpha)) 0%,
+            black 60px,
+            black calc(100% - 60px),
+            rgba(0, 0, 0, var(--mask-bottom-alpha)) 100%);
+    -webkit-mask-image: linear-gradient(to bottom,
+            rgba(0, 0, 0, var(--mask-top-alpha)) 0%,
+            black 60px,
+            black calc(100% - 60px),
+            rgba(0, 0, 0, var(--mask-bottom-alpha)) 100%);
+}
+
+.scroll-content::-webkit-scrollbar {
+    display: none;
+}
+
+.sidebar-footer {
+    padding: 10px 20px 20px 20px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
 }
 
 .logo-text {
@@ -129,7 +201,6 @@ html {
     transition: background 0.2s;
 }
 
-/* アイコンのスタイル (Lucide SVG) */
 .theme-toggle-btn svg {
     color: var(--icon-color);
     width: 20px;
@@ -145,12 +216,12 @@ html {
     background: var(--input-bg);
 }
 
-/* カードスタイル */
 .card {
     background: var(--bg-card);
     padding: 15px;
     border-radius: 10px;
     box-shadow: var(--shadow-md);
+    transition: background 0.3s;
 }
 
 .card h3 {
@@ -160,7 +231,6 @@ html {
     color: var(--accent-color);
 }
 
-/* ファイルアップロードエリア */
 .upload-area {
     display: flex;
     flex-direction: column;
@@ -195,7 +265,6 @@ html {
     display: none;
 }
 
-/* フォームコントロール */
 .control-group {
     display: flex;
     flex-direction: column;
@@ -210,13 +279,14 @@ html {
     letter-spacing: 0.05em;
 }
 
+/* --- カスタムセレクトボックス --- */
 .styled-select,
 .styled-input {
     width: 100%;
     padding: 10px 15px;
     background: var(--input-bg);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 12px;
     color: var(--text-primary);
     font-size: 0.9rem;
     cursor: pointer;
@@ -224,25 +294,102 @@ html {
     outline: none;
 }
 
-.styled-select:focus,
-.styled-input:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px rgba(0, 188, 209, 0.2);
-    background: var(--bg-card);
+/* カスタムセレクトのコンテナ */
+.custom-select-wrapper {
+    position: relative;
+    user-select: none;
+    width: 100%;
 }
 
-/* Select Arrow Customization */
-.styled-select {
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300bcd1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 16px;
-    padding-right: 35px;
+/* セレクトボックス本体（トリガー） */
+.custom-select-trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    color: var(--select-text);
+    background: var(--select-bg);
+    border: 1px solid var(--select-border);
+    border-radius: 12px;
+    /* 修正: 丸みを12pxに増加 */
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-/* ボタン */
+.custom-select-trigger::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--text-secondary);
+    border-bottom: 2px solid var(--text-secondary);
+    transform: rotate(45deg);
+    transition: transform 0.2s;
+    margin-left: 10px;
+    margin-top: -4px;
+}
+
+.custom-select-wrapper.open .custom-select-trigger::after {
+    transform: rotate(-135deg);
+    margin-top: 4px;
+}
+
+/* ドロップダウンリスト */
+.custom-options {
+    position: absolute;
+    display: block;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 8px;
+    background: var(--dropdown-bg);
+    border-radius: 12px;
+    /* ドロップダウンも少し丸く */
+    box-shadow: var(--dropdown-shadow);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.custom-select-wrapper.open .custom-options {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+    transform: translateY(0);
+}
+
+/* 選択肢 */
+.custom-option {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    color: var(--select-text);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.custom-option:hover {
+    background-color: var(--select-hover);
+}
+
+/* 現在選択されている項目 (修正: ホバー時と同じ色にする) */
+.custom-option.selected {
+    background-color: var(--select-hover);
+    /* ホバー色と統一 */
+    font-weight: 500;
+    color: var(--accent-color);
+}
+
+/* --------------------------- */
+
 .btn-primary {
     display: flex;
     align-items: center;
@@ -276,7 +423,6 @@ html {
     transform: scale(0.99);
 }
 
-/* トグルスイッチ */
 .toggle-group {
     display: flex;
     flex-direction: column;
@@ -332,12 +478,12 @@ html {
     transform: translateX(20px);
 }
 
-/* ビューポート */
 .viewport {
     flex: 1;
     position: relative;
     background: var(--bg-canvas);
     overflow: hidden;
+    transition: background 0.3s;
 }
 
 #canvas {
@@ -346,7 +492,6 @@ html {
     height: 100%;
 }
 
-/* レスポンシブデザイン */
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
@@ -359,4 +504,77 @@ html {
         border-right: none;
         border-bottom: 1px solid var(--border-color);
     }
+}
+
+/* スライダー */
+input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background-color: var(--border-color);
+    border-radius: 2px;
+    cursor: pointer;
+    background-image: linear-gradient(var(--accent-color), var(--accent-color));
+    background-size: 50% 100%;
+    background-repeat: no-repeat;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    background: transparent;
+    border-radius: 2px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    cursor: pointer;
+    margin-top: -6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s;
+}
+
+input[type=range]:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px rgba(0, 188, 209, 0.2);
+    transform: scale(1.1);
+}
+
+input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background-color: var(--border-color);
+    border-radius: 2px;
+}
+
+input[type=range]::-moz-range-progress {
+    background-color: var(--accent-color);
+    height: 4px;
+    border-radius: 2px;
+}
+
+input[type=range]::-moz-range-thumb {
+    height: 16px;
+    width: 16px;
+    border: none;
+    border-radius: 50%;
+    background: var(--accent-color);
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+input[type=number] {
+    text-align: center;
+    -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }

@@ -12,14 +12,11 @@ let renderCount = 0;
 function getClearColorFromCss() {
     const viewport = document.querySelector('.viewport');
     if (!viewport) {
-        // Fallback to light mode if element is missing
         return [0.94, 0.95, 0.96, 1.0];
     }
 
-    // Get the computed background color (which respects the CSS variable --bg-canvas)
     const computedColor = window.getComputedStyle(viewport).backgroundColor;
 
-    // We expect an RGB(A) string, e.g., "rgb(224, 226, 229)" or "rgba(x, y, z, a)"
     if (computedColor.startsWith('rgb')) {
         const matches = computedColor.match(/\d+(\.\d+)?/g);
         if (matches && matches.length >= 3) {
@@ -30,20 +27,17 @@ function getClearColorFromCss() {
             return [r, g, b, a];
         }
     }
-
-    // Fallback if parsing fails or computed style is not RGB/RGBA
     return [0.94, 0.95, 0.96, 1.0];
 }
 
 async function init() {
     console.log("Init started");
     canvas = document.getElementById("canvas");
-    // Account for control panel width (340px on desktop)
     const controlPanelWidth = window.innerWidth > 768 ? 340 : 0;
     canvas.width = window.innerWidth - controlPanelWidth;
     canvas.height = window.innerHeight;
 
-    const config = { alpha: false };
+    const config = { alpha: true, preserveDrawingBuffer: true };
     gl = canvas.getContext("webgl", config) || canvas.getContext("experimental-webgl", config);
     if (!gl) {
         alert('WebGL is unavailable.');
@@ -52,7 +46,6 @@ async function init() {
     console.log("WebGL context created");
 
     try {
-        // Create a simple renderer
         if (typeof spine === 'undefined') {
             throw new Error("Spine object is undefined. Script might not be loaded.");
         }
@@ -64,29 +57,68 @@ async function init() {
         return;
     }
 
-    // Handle window resize
     window.addEventListener('resize', () => {
         const controlPanelWidth = window.innerWidth > 768 ? 340 : 0;
         canvas.width = window.innerWidth - controlPanelWidth;
         canvas.height = window.innerHeight;
         if (renderer) {
             renderer.resize(spine.ResizeMode.Expand);
-            // Recalculate camera if skeleton is loaded
             if (skeleton && bounds) {
                 updateCamera();
             }
         }
     });
 
-    // Event listeners
     document.getElementById('file-input').addEventListener('change', handleFileSelect);
     document.getElementById('play-pause').addEventListener('click', togglePlayPause);
+    document.getElementById('save-snapshot').addEventListener('click', saveSnapshot);
     document.getElementById('animation-list').addEventListener('change', changeAnimation);
     document.getElementById('skin-list').addEventListener('change', changeSkin);
 
     console.log("Init finished, starting render loop");
     requestAnimationFrame(render);
 }
+
+// --- UI Initialization Logic (Independent of Spine init) ---
+document.addEventListener('DOMContentLoaded', () => {
+    const paddingSlider = document.getElementById('snapshot-padding-slider');
+    const paddingInput = document.getElementById('snapshot-padding');
+
+    // スライダーの背景（プログレスバー）を更新する関数
+    const updateSliderStyle = () => {
+        if (paddingSlider) {
+            const min = parseFloat(paddingSlider.min) || 0;
+            const max = parseFloat(paddingSlider.max) || 100;
+            const val = parseFloat(paddingSlider.value) || 0;
+            // 0%から100%の間のどこにいるかを計算
+            const percentage = ((val - min) / (max - min)) * 100;
+            // background-sizeの幅を更新 (WebKitブラウザ用)
+            paddingSlider.style.backgroundSize = `${percentage}% 100%`;
+        }
+    };
+
+    if (paddingSlider && paddingInput) {
+        // 初期化
+        updateSliderStyle();
+
+        // スライダー操作時
+        paddingSlider.addEventListener('input', () => {
+            paddingInput.value = paddingSlider.value;
+            updateSliderStyle();
+        });
+
+        // 数値入力時
+        paddingInput.addEventListener('input', () => {
+            const val = parseFloat(paddingInput.value);
+            // スライダーに値を反映（最大値を超えてもスライダーは最大位置で止まる）
+            if (!isNaN(val)) {
+                paddingSlider.value = val;
+                updateSliderStyle();
+            }
+        });
+    }
+});
+// ---------------------------------------------------------
 
 async function handleFileSelect(event) {
     console.log("File selected");
@@ -112,15 +144,13 @@ async function handleFileSelect(event) {
     }
     console.log("Files identified", skelFile.name, atlasFile.name, pngFile.name);
 
-    // Create a custom asset manager that reads from File objects
     assetManager = new spine.AssetManager(gl, (path) => {
-        return path; // We will handle loading manually
+        return path;
     });
 
-    // Override loadTexture to read from the File object
     assetManager.loadTexture = function (path, success, error) {
         console.log("Loading texture", path);
-        const file = fileMap[path] || pngFile; // Fallback to the found png if name doesn't match exactly
+        const file = fileMap[path] || pngFile;
         if (!file) {
             error(`Texture file not found: ${path}`);
             return;
@@ -130,8 +160,6 @@ async function handleFileSelect(event) {
             const img = new Image();
             img.onload = () => {
                 console.log("Image loaded", path);
-                // Create texture with mipmaps disabled (manually set filters)
-                // Removed 3rd arg 'false' just in case it's not supported in 4.0
                 const texture = new spine.GLTexture(gl, img);
                 texture.setFilters(spine.TextureFilter.Linear, spine.TextureFilter.Linear);
                 success(texture);
@@ -141,7 +169,6 @@ async function handleFileSelect(event) {
         reader.readAsDataURL(file);
     };
 
-    // Load atlas
     const atlasText = await readFileAsText(atlasFile);
     console.log("Atlas text loaded");
 
@@ -149,7 +176,6 @@ async function handleFileSelect(event) {
         const atlas = new spine.TextureAtlas(atlasText);
         console.log("Atlas created");
 
-        // Now we need to load the pages (textures) for the atlas
         for (let page of atlas.pages) {
             const file = fileMap[page.name] || pngFile;
             if (file) {
@@ -160,14 +186,12 @@ async function handleFileSelect(event) {
                     img.src = dataUrl;
                 });
                 console.log("Page texture loaded", page.name);
-                // Disable mipmaps here too
                 const texture = new spine.GLTexture(gl, img);
                 texture.setFilters(spine.TextureFilter.Linear, spine.TextureFilter.Linear);
                 page.setTexture(texture);
             }
         }
 
-        // Load Skeleton
         let skeletonData;
         if (skelFile.name.endsWith('.json')) {
             const jsonText = await readFileAsText(skelFile);
@@ -189,7 +213,6 @@ async function handleFileSelect(event) {
 
         animationState = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 
-        // Populate animation list
         const animSelect = document.getElementById('animation-list');
         animSelect.innerHTML = '';
         skeleton.data.animations.forEach(anim => {
@@ -199,7 +222,6 @@ async function handleFileSelect(event) {
             animSelect.appendChild(option);
         });
 
-        // Populate skin list
         const skinSelect = document.getElementById('skin-list');
         skinSelect.innerHTML = '';
         skeleton.data.skins.forEach(skin => {
@@ -209,7 +231,6 @@ async function handleFileSelect(event) {
             skinSelect.appendChild(option);
         });
 
-        // Set initial skin
         if (skeleton.data.skins.length > 0) {
             let initialSkin = skeleton.data.skins.find(s => s.name !== 'default') || skeleton.data.skins[0];
             skeleton.setSkin(initialSkin);
@@ -222,21 +243,8 @@ async function handleFileSelect(event) {
             document.getElementById('animation-controls').style.display = 'block';
         }
 
-        // Debug: Log eye slots
-        console.log("--- Debugging Eye Slots ---");
-        skeleton.slots.forEach(slot => {
-            if (slot.data.name.includes('eye')) {
-                console.log(`Slot: ${slot.data.name}`);
-                console.log(`  Attachment: ${slot.attachment ? slot.attachment.name : 'None'}`);
-                console.log(`  Color: R${slot.color.r} G${slot.color.g} B${slot.color.b} A${slot.color.a}`);
-                console.log(`  Bone: ${slot.bone.data.name} (WorldX: ${slot.bone.worldX}, WorldY: ${slot.bone.worldY})`);
-            }
-        });
-        console.log("---------------------------");
-
         updateCamera();
         console.log("Camera set", renderer.camera.position, renderer.camera.zoom);
-
 
     } catch (e) {
         console.error(e);
@@ -293,17 +301,13 @@ function updateCamera() {
     renderer.camera.position.x = bounds.offset.x + bounds.size.x / 2;
     renderer.camera.position.y = bounds.offset.y + bounds.size.y / 2;
 
-    // Calculate proper zoom to maintain aspect ratio
-    const padding = 0.9; // 10% padding
+    const padding = 0.9;
     const canvasAspect = canvas.width / canvas.height;
     const boundsAspect = bounds.size.x / bounds.size.y;
 
-    // Choose zoom based on which dimension is limiting
     if (canvasAspect > boundsAspect) {
-        // Canvas is wider than content, fit to height
         renderer.camera.zoom = (bounds.size.y / canvas.height) / padding;
     } else {
-        // Canvas is taller than content, fit to width
         renderer.camera.zoom = (bounds.size.x / canvas.width) / padding;
     }
 }
@@ -312,26 +316,116 @@ function togglePlayPause() {
     isPlaying = !isPlaying;
     const button = document.getElementById('play-pause');
 
-    // Check if Lucide icons are available (from the new design)
     if (typeof lucide !== 'undefined') {
-        const icon = button.querySelector('i');
         const span = button.querySelector('span');
-
-        if (isPlaying) {
-            span.textContent = "一時停止"; // New design text
-            if (icon) icon.setAttribute('data-lucide', 'pause');
-        } else {
-            span.textContent = "再生"; // New design text
-            if (icon) icon.setAttribute('data-lucide', 'play');
+        if (span) {
+            span.textContent = isPlaying ? "一時停止" : "再生";
         }
 
-        // Ensure Lucide updates the SVG
+        const oldIcon = button.querySelector('svg, i');
+        if (oldIcon) {
+            oldIcon.remove();
+        }
+
+        const newIcon = document.createElement('i');
+        newIcon.setAttribute('data-lucide', isPlaying ? 'pause' : 'play');
+        button.insertBefore(newIcon, button.firstChild);
+
         lucide.createIcons();
     } else {
-        // Fallback for old design compatibility (text only)
         button.textContent = isPlaying ? "Pause" : "Play";
     }
 }
+
+// --- 形式選択 & 解像度対応スナップショット保存 ---
+function saveSnapshot() {
+    if (!canvas || !renderer || !skeleton) return;
+
+    const originalWidth = canvas.width;
+    const originalHeight = canvas.height;
+    const originalIsPlaying = isPlaying;
+
+    isPlaying = false;
+
+    // --- 設定値の取得 ---
+    const paddingInput = document.getElementById('snapshot-padding');
+    const paddingPx = paddingInput ? parseInt(paddingInput.value, 10) : 50;
+
+    const resolutionSelect = document.getElementById('snapshot-resolution');
+    const targetLongSide = resolutionSelect ? parseInt(resolutionSelect.value, 10) : 4096;
+
+    const formatSelect = document.getElementById('snapshot-format');
+    const mimeType = formatSelect ? formatSelect.value : 'image/png';
+    const extension = mimeType === 'image/webp' ? 'webp' : 'png';
+    // --------------------
+
+    if (animationState) {
+        animationState.apply(skeleton);
+        skeleton.updateWorldTransform();
+    }
+    const offset = new spine.Vector2();
+    const size = new spine.Vector2();
+    skeleton.getBounds(offset, size, []);
+
+    const contentLongSide = Math.max(size.x, size.y);
+    let scale = 1.0;
+    if (contentLongSide > 0) {
+        scale = targetLongSide / contentLongSide;
+    }
+
+    const targetWidth = Math.floor((size.x * scale) + (paddingPx * 2));
+    const targetHeight = Math.floor((size.y * scale) + (paddingPx * 2));
+
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    gl.viewport(0, 0, targetWidth, targetHeight);
+
+    if (renderer.camera) {
+        renderer.camera.viewportWidth = targetWidth;
+        renderer.camera.viewportHeight = targetHeight;
+
+        renderer.camera.position.x = offset.x + size.x / 2;
+        renderer.camera.position.y = offset.y + size.y / 2;
+
+        renderer.camera.zoom = 1.0 / scale;
+    }
+
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    renderer.begin();
+    const pma = document.getElementById('pma-checkbox') ? document.getElementById('pma-checkbox').checked : false;
+    const debug = document.getElementById('debug-checkbox') ? document.getElementById('debug-checkbox').checked : false;
+
+    renderer.drawSkeleton(skeleton, pma);
+    if (debug) {
+        renderer.drawSkeletonDebug(skeleton, pma);
+    }
+    renderer.end();
+
+    try {
+        const dataUrl = canvas.toDataURL(mimeType);
+        const link = document.createElement('a');
+        link.download = `spine_snapshot_${targetWidth}x${targetHeight}.${extension}`;
+        link.href = dataUrl;
+        link.click();
+    } catch (e) {
+        console.error("Snapshot failed:", e);
+        alert("画像の保存に失敗しました。\n" + e.message);
+    }
+
+    canvas.width = originalWidth;
+    canvas.height = originalHeight;
+
+    renderer.resize(spine.ResizeMode.Expand);
+    updateCamera();
+
+    isPlaying = originalIsPlaying;
+    if (!isPlaying) {
+        requestAnimationFrame(render);
+    }
+}
+// ----------------------------------
 
 function render() {
     const now = Date.now() / 1000;
@@ -342,10 +436,8 @@ function render() {
         console.log("Render loop running", renderCount);
     }
 
-    // --- Dynamic Clear Color Fix: Read computed CSS background color and apply to WebGL ---
     const [r, g, b, a] = getClearColorFromCss();
     gl.clearColor(r, g, b, a);
-    // --- End Dynamic Clear Color Fix ---
 
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -358,7 +450,7 @@ function render() {
 
         renderer.begin();
 
-        const pma = document.getElementById('pma-checkbox') ? document.getElementById('pma-checkbox').checked : true;
+        const pma = document.getElementById('pma-checkbox') ? document.getElementById('pma-checkbox').checked : false;
         const debug = document.getElementById('debug-checkbox') ? document.getElementById('debug-checkbox').checked : false;
 
         renderer.drawSkeleton(skeleton, pma);

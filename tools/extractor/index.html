@@ -23,49 +23,84 @@
                 </button>
             </header>
 
-            <div class="card upload-card">
-                <h3>ファイルアップロード</h3>
-                <label for="file-input" class="upload-area">
-                    <i data-lucide="upload-cloud"></i>
-                    <span class="upload-text">.skel, .atlas, .png を選択</span>
-                </label>
-                <input type="file" id="file-input" multiple accept=".skel,.atlas,.png,.json">
+            <div class="scroll-content">
+                <div class="card upload-card">
+                    <h3>ファイルアップロード</h3>
+                    <label for="file-input" class="upload-area">
+                        <i data-lucide="upload-cloud"></i>
+                        <span class="upload-text">.skel, .atlas, .png を選択</span>
+                    </label>
+                    <input type="file" id="file-input" multiple accept=".skel,.atlas,.png,.json">
+                </div>
+
+                <div id="animation-controls" class="card" style="display:none;">
+                    <h3>アニメーションコントロール</h3>
+                    <div class="control-group">
+                        <label for="skin-list">スキン</label>
+                        <select id="skin-list" class="styled-select"></select>
+                    </div>
+
+                    <div class="control-group" style="margin-top: 15px;">
+                        <label for="animation-list">アニメーション</label>
+                        <select id="animation-list" class="styled-select"></select>
+                    </div>
+
+                    <button id="play-pause" class="btn-primary" style="margin-top: 20px;">
+                        <i data-lucide="pause"></i>
+                        <span>一時停止</span>
+                    </button>
+
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                        <div class="control-group">
+                            <label for="snapshot-resolution">保存サイズ (長辺)</label>
+                            <select id="snapshot-resolution" class="styled-select">
+                                <option value="1024">1K (1024px)</option>
+                                <option value="2048">2K (2048px)</option>
+                                <option value="4096" selected>4K (4096px)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" style="margin-top: 10px;">
+                            <label for="snapshot-format">保存形式</label>
+                            <select id="snapshot-format" class="styled-select">
+                                <option value="image/png" selected>PNG</option>
+                                <option value="image/webp">WebP</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" style="margin-top: 10px;">
+                            <label for="snapshot-padding">余白 (px)</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input type="range" id="snapshot-padding-slider" min="0" max="100" value="50"
+                                    style="flex-grow: 1; cursor: pointer;">
+                                <input type="number" id="snapshot-padding" class="styled-input" value="50" min="0"
+                                    step="1" style="width: 80px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="save-snapshot" class="btn-primary" style="margin-top: 15px;">
+                        <i data-lucide="camera"></i>
+                        <span>保存</span>
+                    </button>
+
+                    <div class="toggle-group"
+                        style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                        <label class="toggle-label">
+                            <span class="toggle-text">PMA (Pre-multiplied Alpha)</span>
+                            <input type="checkbox" id="pma-checkbox">
+                            <span class="toggle-switch"></span>
+                        </label>
+                        <label class="toggle-label">
+                            <span class="toggle-text">デバッグ表示</span>
+                            <input type="checkbox" id="debug-checkbox">
+                            <span class="toggle-switch"></span>
+                        </label>
+                    </div>
+                </div>
             </div>
 
-            <div id="animation-controls" class="card" style="display:none;">
-                <h3>アニメーションコントロール</h3>
-                <div class="control-group">
-                    <label for="skin-list">スキン</label>
-                    <select id="skin-list" class="styled-select"></select>
-                </div>
-
-                <div class="control-group" style="margin-top: 15px;">
-                    <label for="animation-list">アニメーション</label>
-                    <select id="animation-list" class="styled-select"></select>
-                </div>
-
-                <button id="play-pause" class="btn-primary" style="margin-top: 20px;">
-                    <i data-lucide="pause"></i>
-                    <span>一時停止</span>
-                </button>
-
-                <div class="toggle-group"
-                    style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color);">
-                    <label class="toggle-label">
-                        <span class="toggle-text">PMA (Pre-multiplied Alpha)</span>
-                        <input type="checkbox" id="pma-checkbox" checked>
-                        <span class="toggle-switch"></span>
-                    </label>
-                    <label class="toggle-label">
-                        <span class="toggle-text">デバッグ表示</span>
-                        <input type="checkbox" id="debug-checkbox">
-                        <span class="toggle-switch"></span>
-                    </label>
-                </div>
-            </div>
-
-            <footer
-                style="margin-top: auto; font-size: 0.75rem; color: var(--text-secondary); text-align: center; padding-top: 10px; border-top: 1px solid var(--border-color);">
+            <footer class="sidebar-footer">
                 Spine WebGL Renderer v4.0.*
             </footer>
         </aside>
