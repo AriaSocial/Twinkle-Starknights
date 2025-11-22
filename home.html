@@ -1,0 +1,202 @@
+<!--
+title: ホーム
+description: 
+published: true
+date: 2025-11-22T18:37:45.946Z
+tags: 
+editor: code
+dateCreated: 2025-11-22T18:37:45.946Z
+-->
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ティンクルスターナイツ Wiki - ホーム</title>
+    <!-- Tailwind CSS CDNを読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 外部CSSファイルを読み込み -->
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* * NOTE: Tailwind CDNを使用しているため、Tailwindのカスタムカラー設定は
+         * HTML内のクラスが正しく参照できるように、このファイルに残します。
+         * カスタムCSS変数（--primary-colorなど）は外部ファイル（style.css）に移動しました。
+         */
+
+        /* Tailwindカスタム設定の拡張 */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tsn-primary': {
+                            DEFAULT: '#00bcd1',
+                            light: '#4dd0e1',
+                            dark: '#00838f',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <!-- ヘッダー (ナビゲーションバー) -->
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <!-- ロゴ/Wikiタイトル -->
+            <div class="text-2xl font-extrabold text-tsn-primary-dark tracking-tight">
+                ティンクルスターナイツ Wiki
+            </div>
+            <!-- ナビゲーションリンク (デスクトップ) -->
+            <nav class="hidden md:flex space-x-8">
+                <a href="#" class="text-gray-600 hover:text-tsn-primary-dark font-medium pb-1 border-b-2 border-transparent hover:border-tsn-primary hover-effect">ホーム</a>
+                <a href="#characters" class="text-gray-600 hover:text-tsn-primary-dark font-medium pb-1 border-b-2 border-transparent hover:border-tsn-primary hover-effect">キャラクター</a>
+                <a href="#events" class="text-gray-600 hover:text-tsn-primary-dark font-medium pb-1 border-b-2 border-transparent hover:border-tsn-primary hover-effect">イベント</a>
+                <a href="#guide" class="text-gray-600 hover:text-tsn-primary-dark font-medium pb-1 border-b-2 border-transparent hover:border-tsn-primary hover-effect">初心者ガイド</a>
+            </nav>
+            <!-- モバイルメニューボタン (ダミー) -->
+            <button class="md:hidden text-gray-600 hover:text-tsn-primary-dark focus:outline-none" aria-label="Toggle Menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        <!-- ヒーローセクション (キービジュアル風) -->
+        <!-- style属性で直接CSS変数を参照する場合は、style.cssで定義した変数名を使用します -->
+        <section class="mb-16 bg-tsn-primary-light rounded-2xl shadow-xl overflow-hidden p-6 sm:p-12 text-white" style="background-color: var(--primary-light);">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-3/5">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black mb-4 leading-tight">
+                        ティンクルスターナイツ<br class="hidden sm:inline"> 徹底攻略Wiki
+                    </h1>
+                    <p class="text-xl sm:text-2xl mb-6 font-light">
+                        最新情報、キャラクターデータ、イベント攻略情報を随時更新！
+                    </p>
+                    <a href="#news" class="inline-block bg-white text-tsn-primary font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 hover-effect transition duration-300">
+                        最新ニュースを見る
+                    </a>
+                </div>
+                <div class="md:w-2/5 mt-6 md:mt-0 flex justify-center">
+                    <!-- ゲームのロゴまたはアイコンのプレースホルダー -->
+                    <div class="w-32 h-32 sm:w-48 sm:h-48 bg-tsn-primary-dark rounded-full flex items-center justify-center shadow-2xl">
+                        <span class="text-4xl sm:text-6xl font-bold">✨</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ニュース＆更新情報セクション -->
+        <section id="news" class="mb-16">
+            <h2 class="section-title text-3xl font-bold mb-8 text-gray-800">最新情報・更新履歴</h2>
+            <div id="news-container" class="space-y-4">
+                <!-- ニュースアイテムがJSで挿入される -->
+            </div>
+        </section>
+
+        <!-- 主要コンテンツセクション (キャラクター) -->
+        <section id="characters" class="mb-16">
+            <h2 class="section-title text-3xl font-bold mb-8 text-gray-800">主要コンテンツ：キャラクター</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- カード 1: キャラクター一覧 -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-tsn-primary hover-effect">
+                    <h3 class="text-xl font-semibold mb-2 text-tsn-primary-dark">キャラクター一覧</h3>
+                    <p class="text-gray-600 mb-4">全キャラのステータス、スキル、プロフィールを網羅。</p>
+                    <a href="#" class="text-tsn-primary hover:text-tsn-primary-dark font-medium flex items-center">
+                        データを見る
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </a>
+                </div>
+                <!-- カード 2: 属性別リスト -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-tsn-primary hover-effect">
+                    <h3 class="text-xl font-semibold mb-2 text-tsn-primary-dark">属性・レアリティ別</h3>
+                    <p class="text-gray-600 mb-4">編成に役立つ属性・武器種別の絞り込みリスト。</p>
+                    <a href="#" class="text-tsn-primary hover:text-tsn-primary-dark font-medium flex items-center">
+                        リストを見る
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </a>
+                </div>
+                <!-- カード 3: おすすめ編成 -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-tsn-primary hover-effect">
+                    <h3 class="text-xl font-semibold mb-2 text-tsn-primary-dark">おすすめ編成・Tier</h3>
+                    <p class="text-gray-600 mb-4">環境最強のパーティー編成と、キャラクターの評価ランキング。</p>
+                    <a href="#" class="text-tsn-primary hover:text-tsn-primary-dark font-medium flex items-center">
+                        ランキングを見る
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- イベントセクション -->
+        <section id="events" class="mb-16">
+            <h2 class="section-title text-3xl font-bold mb-8 text-gray-800">開催中・開催予定イベント</h2>
+            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-tsn-primary">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div class="mb-4 sm:mb-0">
+                        <span class="inline-block bg-red-100 text-red-800 text-xs font-bold px-3 py-1 rounded-full uppercase mr-3">開催中！</span>
+                        <h3 class="text-2xl font-semibold text-gray-900">「星降る夜の幻想曲」攻略</h3>
+                        <p class="text-gray-600 mt-1">限定キャラ、ドロップアイテム、おすすめ周回ルートを解説。</p>
+                    </div>
+                    <a href="#" class="bg-tsn-primary text-white font-bold py-2 px-6 rounded-full hover:bg-tsn-primary-dark hover-effect transition duration-300 whitespace-nowrap">
+                        イベントページへ
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 初心者ガイドセクション -->
+        <section id="guide" class="mb-16">
+            <h2 class="section-title text-3xl font-bold mb-8 text-gray-800">初心者向けガイド</h2>
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <ul class="space-y-4">
+                    <li class="border-b pb-4 last:border-b-0 last:pb-0">
+                        <a href="#" class="block text-xl font-medium text-gray-700 hover:text-tsn-primary transition duration-150">
+                            リセマラの効率的なやり方と当たりキャラ
+                        </a>
+                    </li>
+                    <li class="border-b pb-4 last:border-b-0 last:pb-0">
+                        <a href="#" class="block text-xl font-medium text-gray-700 hover:text-tsn-primary transition duration-150">
+                            バトルシステム解説！連携とブレイクをマスターしよう
+                        </a>
+                    </li>
+                    <li class="border-b pb-4 last:border-b-0 last:pb-0">
+                        <a href="#" class="block text-xl font-medium text-gray-700 hover:text-tsn-primary transition duration-150">
+                            無課金・微課金向け！効率の良いアイテム・石の集め方
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="bg-white border-t border-gray-200 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-sm text-gray-500 mb-4 md:mb-0">
+                    &copy; 2024 ティンクルスターナイツ 攻略Wiki. All Rights Reserved.
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-500 hover:text-tsn-primary-dark text-sm">Wiki編集方針</a>
+                    <a href="#" class="text-gray-500 hover:text-tsn-primary-dark text-sm">お問い合わせ</a>
+                    <a href="#" class="text-gray-500 hover:text-tsn-primary-dark text-sm">DMM GAMES公式サイト</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 外部JavaScriptファイルを読み込み -->
+    <script src="script.js"></script>
+</body>
+</html>
